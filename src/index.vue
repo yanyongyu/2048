@@ -1,18 +1,17 @@
 <template>
   <div class="wrapper">
+    <text>hello</text>
     <router-view />
   </div>
 </template>
 
 <script>
 export default {
-  name: "App",
+  name: 'App',
   data() {
-    return {
-      logo: "https://gw.alicdn.com/tfs/TB1yopEdgoQMeJjy1XaXXcSsFXa-640-302.png",
-    };
-  },
-};
+    return {}
+  }
+}
 </script>
 
 <style scoped>

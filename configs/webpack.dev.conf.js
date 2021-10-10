@@ -1,75 +1,75 @@
-const commonConfig = require("./webpack.common.conf");
-const { merge: webpackMerge } = require("webpack-merge"); // used to merge webpack configs
+const commonConfig = require('./webpack.common.conf')
+const { merge: webpackMerge } = require('webpack-merge') // used to merge webpack configs
 // tools
-const chalk = require("chalk");
-const path = require("path");
-const webpack = require("webpack");
-const ip = require("ip").address();
+const chalk = require('chalk')
+const path = require('path')
+const webpack = require('webpack')
+const ip = require('ip').address()
 
 /**
  * Webpack Plugins
  */
-const HtmlWebpackPlugin = require("html-webpack-plugin-for-multihtml");
-const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
-const portfinder = require("portfinder");
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
+const portfinder = require('portfinder')
 
-const config = require("./config");
-const utils = require("./utils");
-const helper = require("./helper");
+const config = require('./config')
+const utils = require('./utils')
+const helper = require('./helper')
 
 /**
  * Modify the url that will open on the browser.
  * @param {Array} entry
  */
 const postMessageToOpenPage = (entry) => {
-  let entrys = Object.keys(entry);
-  let openpage = config.dev.openPage;
+  let entrys = Object.keys(entry)
+  let openpage = config.dev.openPage
   // exclude vendor entry.
-  entrys = entrys.filter((entry) => entry !== "vendor");
-  if (entrys.indexOf("index") > -1) {
-    openpage += `?page=index.js`;
+  entrys = entrys.filter((entry) => entry !== 'vendor')
+  if (entrys.indexOf('index') > -1) {
+    openpage += `?page=index.js`
   } else {
-    openpage += `?page=${entrys[0]}.js`;
+    openpage += `?page=${entrys[0]}.js`
   }
   if (entrys.length > 1) {
-    openpage += `&entrys=${entrys.join("|")}`;
+    openpage += `&entrys=${entrys.join('|')}`
   }
-  return openpage;
-};
+  return openpage
+}
 
-const openPage = postMessageToOpenPage(commonConfig[0].entry);
+const openPage = postMessageToOpenPage(commonConfig[0].entry)
 
 // hotreload server for playground App
-const wsServer = require("./hotreload");
-let wsTempServer = null;
+const wsServer = require('./hotreload')
+let wsTempServer = null
 
 /**
  * Generate multiple entrys
  * @param {Array} entry
  */
 const generateHtmlWebpackPlugin = (entry) => {
-  let entrys = Object.keys(entry);
+  let entrys = Object.keys(entry)
   // exclude vendor entry.
-  entrys = entrys.filter((entry) => entry !== "vendor");
+  entrys = entrys.filter((entry) => entry !== 'vendor')
   const htmlPlugin = entrys.map((name) => {
     return new HtmlWebpackPlugin({
-      multihtmlCache: true,
-      filename: name + ".html",
+      filename: name + '.html',
       template: helper.rootNode(`web/index.html`),
       isDevServer: true,
-      chunksSortMode: "dependency",
+      chunksSortMode: 'auto',
       inject: true,
       devScripts: config.dev.htmlOptions.devScripts,
-      chunks: ["vendor", name],
-    });
-  });
-  return htmlPlugin;
-};
+      chunks: ['vendor', name],
+    })
+  })
+  return htmlPlugin
+}
 
 /**
  * Webpack configuration for browser.
  */
 const devWebpackConfig = webpackMerge(commonConfig[0], {
+  mode: 'development',
   /*
    * Options affecting the resolving of modules.
    *
@@ -101,7 +101,7 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
      * See: https://webpack.js.org/plugins/define-plugin/
      */
     new webpack.DefinePlugin({
-      "process.env": {
+      'process.env': {
         NODE_ENV: config.dev.env,
       },
     }),
@@ -122,7 +122,7 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
      * See: https://github.com/numical/script-ext-html-webpack-plugin
      */
     new ScriptExtHtmlWebpackPlugin({
-      defaultAttribute: "defer",
+      defaultAttribute: 'defer',
     }),
   ],
   /**
@@ -135,7 +135,7 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
    */
   devServer: {
     client: {
-      logging: "warn",
+      logging: 'warn',
       overlay: config.dev.errorOverlay
         ? { warnings: false, errors: true }
         : false,
@@ -152,37 +152,37 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
     open: config.dev.open && encodeURI(openPage),
   },
   watchOptions: config.dev.watchOptions,
-});
+})
 
 /**
  * Webpack configuration for weex.
  */
 const weexConfig = webpackMerge(commonConfig[1], {
   watch: true,
-});
+})
 
 // build source to weex_bundle with watch mode.
 webpack(weexConfig, (err, stats) => {
   if (err) {
-    console.error("COMPILE ERROR:", err.stack);
+    console.error('COMPILE ERROR:', err.stack)
   } else {
-    wsTempServer && wsTempServer.sendSocketMessage();
+    wsTempServer && wsTempServer.sendSocketMessage()
   }
-});
+})
 
 module.exports = new Promise((resolve, reject) => {
-  portfinder.basePort = process.env.PORT || config.dev.port;
+  portfinder.basePort = process.env.PORT || config.dev.port
   portfinder.getPort((err, port) => {
     if (err) {
-      reject(err);
+      reject(err)
     } else {
       // publish the new Port, necessary for e2e tests
-      process.env.PORT = port;
+      process.env.PORT = port
       // add port to devServer config
-      devWebpackConfig.devServer.port = port;
+      devWebpackConfig.devServer.port = port
       devWebpackConfig.devServer.open =
-        `http://${ip}:${port}/` + devWebpackConfig.devServer.open;
-      devWebpackConfig.devServer.open += `&wsport=${port + 1}`;
+        `http://${ip}:${port}/` + devWebpackConfig.devServer.open
+      devWebpackConfig.devServer.open += `&wsport=${port + 1}`
       // Add FriendlyErrorsPlugin
       // devWebpackConfig.plugins.push(
       //   new FriendlyErrorsPlugin({
@@ -198,8 +198,8 @@ module.exports = new Promise((resolve, reject) => {
       //       : undefined,
       //   })
       // );
-      wsTempServer = new wsServer(port + 1);
-      resolve(devWebpackConfig);
+      wsTempServer = new wsServer(port + 1)
+      resolve(devWebpackConfig)
     }
-  });
-});
+  })
+})

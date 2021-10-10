@@ -4,8 +4,8 @@
 
 <script>
 export default {
-  name: "Game2",
-};
+  name: 'Game'
+}
 </script>
 
 <style scoped></style>
