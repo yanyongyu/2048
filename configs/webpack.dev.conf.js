@@ -59,7 +59,7 @@ const generateHtmlWebpackPlugin = (entry) => {
       chunksSortMode: 'auto',
       inject: true,
       devScripts: config.dev.htmlOptions.devScripts,
-      chunks: ['vendor', name],
+      chunks: ['vendor', name]
     })
   })
   return htmlPlugin
@@ -78,8 +78,8 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
   module: {
     rules: utils.styleLoaders({
       sourceMap: config.dev.cssSourceMap,
-      usePostCSS: true,
-    }),
+      usePostCSS: true
+    })
   },
   /**
    * Developer tool to enhance debugging
@@ -102,8 +102,8 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
      */
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: config.dev.env,
-      },
+        NODE_ENV: config.dev.env
+      }
     }),
     /*
      * Plugin: HtmlWebpackPlugin
@@ -122,8 +122,8 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
      * See: https://github.com/numical/script-ext-html-webpack-plugin
      */
     new ScriptExtHtmlWebpackPlugin({
-      defaultAttribute: 'defer',
-    }),
+      defaultAttribute: 'defer'
+    })
   ],
   /**
    * Webpack Development Server configuration
@@ -138,27 +138,28 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
       logging: 'warn',
       overlay: config.dev.errorOverlay
         ? { warnings: false, errors: true }
-        : false,
+        : false
     },
     compress: true,
     static: {
       directory: config.dev.contentBase,
-      watch: config.dev.watchContentBase,
+      watch: config.dev.watchContentBase
     },
     host: config.dev.host,
     port: config.dev.port,
     historyApiFallback: config.dev.historyApiFallback,
     proxy: config.dev.proxyTable,
-    open: config.dev.open && encodeURI(openPage),
+    open: config.dev.open && encodeURI(openPage)
   },
-  watchOptions: config.dev.watchOptions,
+  watchOptions: config.dev.watchOptions
 })
 
 /**
  * Webpack configuration for weex.
  */
 const weexConfig = webpackMerge(commonConfig[1], {
-  watch: true,
+  mode: 'development',
+  watch: true
 })
 
 // build source to weex_bundle with watch mode.

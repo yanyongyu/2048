@@ -30,6 +30,7 @@
   "dependencies": {
     "phantom-limb": "0.0.1",
     "vue": "^2.5.11",
+    "vue-fragment": "^1.5.2",
     "vue-router": "^3.0.1",
     "weex-vue-render": "^1.0.17"
   },
