@@ -10,7 +10,7 @@ const vueWebTemp = helper.rootNode(config.templateDir)
 const hasPluginInstalled = fs.existsSync(helper.rootNode(config.pluginFilePath))
 const isWin = /^win/.test(process.platform)
 const weexEntry = {
-  index: helper.root('entry.js'),
+  index: helper.root('entry.js')
 }
 
 const getEntryFileContent = (source, routerpath) => {
@@ -59,7 +59,7 @@ const getEntryFile = () => {
     getRouterFileContent(helper.root(config.routerFilePath))
   )
   return {
-    index: entryFile,
+    index: entryFile
   }
 }
 
@@ -77,9 +77,9 @@ const createLintingPlugin = () =>
     files: [
       helper.rootNode('src/**/*.js'),
       helper.rootNode('src/**/*.vue'),
-      helper.rootNode('test/**/*.js'),
+      helper.rootNode('test/**/*.js')
     ],
-    emitWarning: !config.dev.showEslintErrorsInOverlay,
+    emitWarning: !config.dev.showEslintErrorsInOverlay
   })
 const useEslint = config.dev.useEslint ? [createLintingPlugin()] : []
 
@@ -95,8 +95,8 @@ const plugins = useEslint.concat([
    */
   new webpack.DefinePlugin({
     'process.env': {
-      NODE_ENV: config.dev.env,
-    },
+      NODE_ENV: config.dev.env
+    }
   }),
   /*
    * Plugin: BannerPlugin
@@ -106,19 +106,19 @@ const plugins = useEslint.concat([
   new webpack.BannerPlugin({
     banner: '// { "framework": "Vue"} \n',
     raw: true,
-    exclude: 'Vue',
-  }),
+    exclude: 'Vue'
+  })
 ])
 
 // Config for compile jsbundle for web.
 const webConfig = {
-  mode: 'production',
+  mode: 'none',
   entry: Object.assign(webEntry, {
-    vendor: [path.resolve('node_modules/phantom-limb/index.js')],
+    vendor: [path.resolve('node_modules/phantom-limb/index.js')]
   }),
   output: {
     path: helper.rootNode('./dist'),
-    filename: '[name].web.js',
+    filename: '[name].web.js'
   },
   /**
    * Options affecting the resolving of modules.
@@ -127,8 +127,8 @@ const webConfig = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
-      '@': helper.resolve('src'),
-    },
+      '@': helper.resolve('src')
+    }
   },
   /*
    * Options affecting the resolving of modules.
@@ -142,10 +142,10 @@ const webConfig = {
         test: /\.js$/,
         use: [
           {
-            loader: 'babel-loader',
-          },
+            loader: 'babel-loader'
+          }
         ],
-        exclude: config.excludeModuleReg,
+        exclude: config.excludeModuleReg
       },
       {
         test: /\.vue(\?[^?]+)?$/,
@@ -164,44 +164,45 @@ const webConfig = {
                   // to convert weex exclusive styles.
                   require('postcss-plugin-weex')(),
                   require('autoprefixer')({
-                    browsers: ['> 0.1%', 'ios >= 8', 'not ie < 12'],
+                    browsers: ['> 0.1%', 'ios >= 8', 'not ie < 12']
                   }),
                   require('postcss-plugin-px2rem')({
                     // base on 750px standard.
                     rootValue: 75,
                     // to leave 1px alone.
-                    minPixelValue: 1.01,
-                  }),
+                    minPixelValue: 1.01
+                  })
                 ],
                 compilerModules: [
                   {
                     postTransformNode: (el) => {
                       // to convert vnode for weex components.
                       require('weex-vue-precompiler')()(el)
-                    },
-                  },
-                ],
+                    }
+                  }
+                ]
               }
-            ),
-          },
+            )
+          }
         ],
-        exclude: config.excludeModuleReg,
-      },
-    ],
+        exclude: config.excludeModuleReg
+      }
+    ]
   },
   /*
    * Add additional plugins to the compiler.
    *
    * See: http://webpack.github.io/docs/configuration.html#plugins
    */
-  plugins: plugins,
+  plugins: plugins
 }
 // Config for compile jsbundle for native.
 const weexConfig = {
+  mode: 'none',
   entry: weexEntry,
   output: {
     path: path.join(__dirname, '../dist'),
-    filename: '[name].js',
+    filename: '[name].js'
   },
   /**
    * Options affecting the resolving of modules.
@@ -210,8 +211,8 @@ const weexConfig = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
-      '@': helper.resolve('src'),
-    },
+      '@': helper.resolve('src')
+    }
   },
   /*
    * Options affecting the resolving of modules.
@@ -224,22 +225,22 @@ const weexConfig = {
         test: /\.js$/,
         use: [
           {
-            loader: 'babel-loader',
-          },
+            loader: 'babel-loader'
+          }
         ],
-        exclude: config.excludeModuleReg,
+        exclude: config.excludeModuleReg
       },
       {
         test: /\.vue(\?[^?]+)?$/,
         use: [
           {
             loader: 'weex-loader',
-            options: vueLoaderConfig({ useVue: false }),
-          },
+            options: vueLoaderConfig({ useVue: false })
+          }
         ],
-        exclude: config.excludeModuleReg,
-      },
-    ],
+        exclude: config.excludeModuleReg
+      }
+    ]
   },
   /*
    * Add additional plugins to the compiler.
@@ -253,7 +254,7 @@ const weexConfig = {
    *
    * See: https://webpack.github.io/docs/configuration.html#node
    */
-  node: config.nodeConfiguration,
+  node: config.nodeConfiguration
 }
 
 module.exports = [webConfig, weexConfig]

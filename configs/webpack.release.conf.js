@@ -1,5 +1,5 @@
 const commonConfig = require('./webpack.common.conf')
-const webpackMerge = require('webpack-merge') // used to merge webpack configs
+const { merge: webpackMerge } = require('webpack-merge') // used to merge webpack configs
 // tools
 const ip = require('ip').address()
 const os = require('os')

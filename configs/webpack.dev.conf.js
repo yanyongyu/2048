@@ -69,7 +69,6 @@ const generateHtmlWebpackPlugin = (entry) => {
  * Webpack configuration for browser.
  */
 const devWebpackConfig = webpackMerge(commonConfig[0], {
-  mode: 'development',
   /*
    * Options affecting the resolving of modules.
    *
@@ -158,7 +157,6 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
  * Webpack configuration for weex.
  */
 const weexConfig = webpackMerge(commonConfig[1], {
-  mode: 'development',
   watch: true
 })
 

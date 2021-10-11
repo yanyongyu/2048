@@ -9,12 +9,8 @@
 </template>
 
 <script>
-import { Fragment } from 'vue-fragment'
 export default {
-  name: 'Game',
-  components: {
-    Fragment
-  }
+  name: 'Game'
 }
 </script>
 

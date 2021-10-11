@@ -1,5 +1,5 @@
 const commonConfig = require('./webpack.common.conf')
-const webpackMerge = require('webpack-merge') // used to merge webpack configs
+const { merge: webpackMerge } = require('webpack-merge') // used to merge webpack configs
 const os = require('os')
 const webpack = require('webpack')
 
@@ -34,8 +34,8 @@ const weexConfig = webpackMerge(commonConfig[1], {
       compressor: {
         warnings: false,
         drop_console: true,
-        drop_debugger: true,
-      },
+        drop_debugger: true
+      }
     }),
     // Need to run uglify first, then pipe other webpack plugins
     ...commonConfig[1].plugins,
@@ -47,10 +47,10 @@ const weexConfig = webpackMerge(commonConfig[1], {
      */
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: config.prod.env,
-      },
-    }),
-  ],
+        NODE_ENV: config.prod.env
+      }
+    })
+  ]
 })
 
 /**
@@ -89,7 +89,7 @@ const webConfig = webpackMerge(commonConfig[0], {
      *
      * See: http://webpack.github.io/docs/configuration.html#output-sourcemapfilename
      */
-    sourceMapFilename: '[name].web.map',
+    sourceMapFilename: '[name].web.map'
   },
   /*
    * Add additional plugins to the compiler.
@@ -105,8 +105,8 @@ const webConfig = webpackMerge(commonConfig[0], {
      */
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: config.prod.env,
-      },
+        NODE_ENV: config.prod.env
+      }
     }),
     /*
      * Plugin: UglifyJsparallelPlugin
@@ -121,10 +121,10 @@ const webConfig = webpackMerge(commonConfig[0], {
       compressor: {
         warnings: false,
         drop_console: true,
-        drop_debugger: true,
-      },
-    }),
-  ],
+        drop_debugger: true
+      }
+    })
+  ]
 })
 
 module.exports = [weexConfig, webConfig]
