@@ -1,47 +1,43 @@
-const commonConfig = require('./webpack.common.conf')
-const { merge: webpackMerge } = require('webpack-merge') // used to merge webpack configs
+const commonConfig = require('./webpack.common.conf');
+const webpackMerge = require('webpack-merge'); // used to merge webpack configs
 // tools
-const ip = require('ip').address()
-const os = require('os')
-const chalk = require('chalk')
-const path = require('path')
-const webpack = require('webpack')
-const helper = require('./helper')
-const config = require('./config')
+const ip = require('ip').address();
+const os = require('os');
+const chalk = require('chalk');
+const path = require('path');
+const webpack = require('webpack');
+const helper = require('./helper');
+const config = require('./config');
 
-console.log(
-  `${chalk.green(
-    `Package web project at ${chalk.bold(path.resolve('./release/web'))}!`
-  )}`
-)
+console.log(`${chalk.green(`Package web project at ${chalk.bold(path.resolve('./release/web'))}!`)}`)
 /**
  * Webpack Plugins
  */
-const UglifyJsparallelPlugin = require('webpack-uglify-parallel')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
+const UglifyJsparallelPlugin = require('webpack-uglify-parallel');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
 /**
  * Generate multiple entrys
- * @param {Array} entry
+ * @param {Array} entry 
  */
 const generateMultipleEntrys = (entry) => {
-  let entrys = Object.keys(entry)
+  let entrys = Object.keys(entry);
   // exclude vendor entry.
-  entrys = entrys.filter((entry) => entry !== 'vendor')
-  const htmlPlugin = entrys.map((name) => {
+  entrys = entrys.filter(entry => entry !== 'vendor' );
+  const htmlPlugin = entrys.map(name => {
     return new HtmlWebpackPlugin({
       filename: name + '.html',
       template: helper.rootNode(`web/index.html`),
       isDevServer: true,
-      chunksSortMode: 'auto',
+      chunksSortMode: 'dependency',
       inject: true,
       chunks: [name],
       // production
       minimize: true
     })
   })
-  return htmlPlugin
+  return htmlPlugin;
 }
 
 /**
@@ -97,13 +93,13 @@ const productionConfig = webpackMerge(commonConfig[0], {
   plugins: [
     /**
      * Plugin: webpack.DefinePlugin
-     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time.
+     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time. 
      *
      * See: https://webpack.js.org/plugins/define-plugin/
      */
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: config.prod.env
+        'NODE_ENV': config.prod.env
       }
     }),
     /*
@@ -154,7 +150,7 @@ const productionConfig = webpackMerge(commonConfig[0], {
       }
     })
   ]
-})
+});
 
 /**
  * Webpack configuration for weex.
@@ -188,13 +184,13 @@ const weexConfig = webpackMerge(commonConfig[1], {
   plugins: [
     /**
      * Plugin: webpack.DefinePlugin
-     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time.
+     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time. 
      *
      * See: https://webpack.js.org/plugins/define-plugin/
      */
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: config.prod.env
+        'NODE_ENV': config.prod.env
       }
     }),
     /*

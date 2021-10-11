@@ -1,68 +1,71 @@
-const commonConfig = require('./webpack.common.conf')
-const { merge: webpackMerge } = require('webpack-merge') // used to merge webpack configs
+const commonConfig = require('./webpack.common.conf');
+const webpackMerge = require('webpack-merge'); // used to merge webpack configs
 // tools
-const chalk = require('chalk')
-const path = require('path')
-const webpack = require('webpack')
-const ip = require('ip').address()
+const chalk = require('chalk');
+const path = require('path');
+const webpack = require('webpack');
+const ip = require('ip').address();
 
 /**
  * Webpack Plugins
  */
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin-for-multihtml');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
-const config = require('./config')
-const utils = require('./utils')
-const helper = require('./helper')
+const config = require('./config');
+const utils = require('./utils');
+const helper = require('./helper');
 
 /**
  * Modify the url that will open on the browser.
- * @param {Array} entry
+ * @param {Array} entry 
  */
-const postMessageToOpenPage = (entry) => {
-  let entrys = Object.keys(entry)
-  let openpage = config.dev.openPage
+const postMessageToOpenPage =  (entry) => {
+  let entrys = Object.keys(entry);
+  let openpage = config.dev.openPage;
   // exclude vendor entry.
-  entrys = entrys.filter((entry) => entry !== 'vendor')
-  if (entrys.indexOf('index') > -1) {
-    openpage += `?page=index.js`
-  } else {
-    openpage += `?page=${entrys[0]}.js`
+  entrys = entrys.filter(entry => entry !== 'vendor' );
+  if(entrys.indexOf('index') > -1) {
+    openpage += `?page=index.js`;
   }
-  if (entrys.length > 1) {
+  else {
+    openpage += `?page=${entrys[0]}.js`;
+  }
+  if(entrys.length > 1) {
     openpage += `&entrys=${entrys.join('|')}`
   }
-  return openpage
+  return openpage;
 }
 
-const openPage = postMessageToOpenPage(commonConfig[0].entry)
+const openPage = postMessageToOpenPage(commonConfig[0].entry);
 
 // hotreload server for playground App
-const wsServer = require('./hotreload')
+const wsServer = require('./hotreload');
 let wsTempServer = null
 
 /**
  * Generate multiple entrys
- * @param {Array} entry
+ * @param {Array} entry 
  */
 const generateHtmlWebpackPlugin = (entry) => {
-  let entrys = Object.keys(entry)
+  let entrys = Object.keys(entry);
   // exclude vendor entry.
-  entrys = entrys.filter((entry) => entry !== 'vendor')
-  const htmlPlugin = entrys.map((name) => {
+  entrys = entrys.filter(entry => entry !== 'vendor' );
+  const htmlPlugin = entrys.map(name => {
     return new HtmlWebpackPlugin({
+      multihtmlCache: true,
       filename: name + '.html',
       template: helper.rootNode(`web/index.html`),
       isDevServer: true,
-      chunksSortMode: 'auto',
+      chunksSortMode: 'dependency',
       inject: true,
       devScripts: config.dev.htmlOptions.devScripts,
       chunks: ['vendor', name]
     })
   })
-  return htmlPlugin
+  return htmlPlugin;
 }
 
 /**
@@ -75,12 +78,9 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
    * See: http://webpack.github.io/docs/configuration.html#module
    */
   module: {
-    rules: utils.styleLoaders({
-      sourceMap: config.dev.cssSourceMap,
-      usePostCSS: true
-    })
+    rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap, usePostCSS: true })
   },
-  /**
+   /**
    * Developer tool to enhance debugging
    *
    * See: http://webpack.github.io/docs/configuration.html#devtool
@@ -95,13 +95,13 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
   plugins: [
     /**
      * Plugin: webpack.DefinePlugin
-     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time.
+     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time. 
      *
      * See: https://webpack.js.org/plugins/define-plugin/
      */
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: config.dev.env
+        'NODE_ENV': config.dev.env
       }
     }),
     /*
@@ -133,25 +133,24 @@ const devWebpackConfig = webpackMerge(commonConfig[0], {
    * See: https://webpack.github.io/docs/webpack-dev-server.html
    */
   devServer: {
-    client: {
-      logging: 'warn',
-      overlay: config.dev.errorOverlay
-        ? { warnings: false, errors: true }
-        : false
-    },
+    clientLogLevel: 'warning',
     compress: true,
-    static: {
-      directory: config.dev.contentBase,
-      watch: config.dev.watchContentBase
-    },
+    contentBase: config.dev.contentBase,
     host: config.dev.host,
     port: config.dev.port,
     historyApiFallback: config.dev.historyApiFallback,
+    public: config.dev.public,
+    open:config.dev.open,
+    watchContentBase: config.dev.watchContentBase,
+    overlay: config.dev.errorOverlay
+    ? { warnings: false, errors: true }
+    : false,
     proxy: config.dev.proxyTable,
-    open: config.dev.open && encodeURI(openPage)
-  },
-  watchOptions: config.dev.watchOptions
-})
+    quiet: true, // necessary for FriendlyErrorsPlugin
+    openPage: encodeURI(openPage),
+    watchOptions: config.dev.watchOptions
+  }
+});
 
 /**
  * Webpack configuration for weex.
@@ -163,7 +162,7 @@ const weexConfig = webpackMerge(commonConfig[1], {
 // build source to weex_bundle with watch mode.
 webpack(weexConfig, (err, stats) => {
   if (err) {
-    console.error('COMPILE ERROR:', err.stack)
+    console.err('COMPILE ERROR:', err.stack)
   } else {
     wsTempServer && wsTempServer.sendSocketMessage()
   }
@@ -179,25 +178,20 @@ module.exports = new Promise((resolve, reject) => {
       process.env.PORT = port
       // add port to devServer config
       devWebpackConfig.devServer.port = port
-      devWebpackConfig.devServer.open =
-        `http://${ip}:${port}/` + devWebpackConfig.devServer.open
-      devWebpackConfig.devServer.open += `&wsport=${port + 1}`
+      devWebpackConfig.devServer.public = `${ip}:${port}`
+      devWebpackConfig.devServer.openPage += `&wsport=${port+1}`
       // Add FriendlyErrorsPlugin
-      // devWebpackConfig.plugins.push(
-      //   new FriendlyErrorsPlugin({
-      //     compilationSuccessInfo: {
-      //       messages: [
-      //         `Your application is running here: ${chalk.yellow(
-      //           `http://${devWebpackConfig.devServer.host}:${port}`
-      //         )}.`,
-      //       ],
-      //     },
-      //     onErrors: config.dev.notifyOnErrors
-      //       ? utils.createNotifierCallback()
-      //       : undefined,
-      //   })
-      // );
-      wsTempServer = new wsServer(port + 1)
+      devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
+        compilationSuccessInfo: {
+          messages: [
+            `Your application is running here: ${chalk.yellow(`http://${devWebpackConfig.devServer.host}:${port}`)}.`
+          ],
+        },
+        onErrors: config.dev.notifyOnErrors
+        ? utils.createNotifierCallback()
+        : undefined
+      }))
+      wsTempServer = new wsServer(port+1)
       resolve(devWebpackConfig)
     }
   })

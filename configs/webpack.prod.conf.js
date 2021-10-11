@@ -1,61 +1,61 @@
-const commonConfig = require('./webpack.common.conf')
-const { merge: webpackMerge } = require('webpack-merge') // used to merge webpack configs
-const os = require('os')
-const webpack = require('webpack')
+const commonConfig = require('./webpack.common.conf');
+const webpackMerge = require('webpack-merge'); // used to merge webpack configs
+const os = require('os');
+const webpack = require('webpack');
 
-const config = require('./config')
-const helper = require('./helper')
+const config = require('./config');
+const helper = require('./helper');
 
 /**
  * Webpack Plugins
  */
-const UglifyJsparallelPlugin = require('webpack-uglify-parallel')
+const UglifyJsparallelPlugin = require('webpack-uglify-parallel');
 
 /**
  * Webpack configuration for weex.
  */
 const weexConfig = webpackMerge(commonConfig[1], {
-  /*
-   * Add additional plugins to the compiler.
-   *
-   * See: http://webpack.github.io/docs/configuration.html#plugins
-   */
-  plugins: [
     /*
-     * Plugin: UglifyJsparallelPlugin
-     * Description: Identical to standard uglify webpack plugin
-     * with an option to build multiple files in parallel
+     * Add additional plugins to the compiler.
      *
-     * See: https://www.npmjs.com/package/webpack-uglify-parallel
+     * See: http://webpack.github.io/docs/configuration.html#plugins
      */
-    new UglifyJsparallelPlugin({
-      workers: os.cpus().length,
-      mangle: true,
-      compressor: {
-        warnings: false,
-        drop_console: true,
-        drop_debugger: true
-      }
-    }),
-    // Need to run uglify first, then pipe other webpack plugins
-    ...commonConfig[1].plugins,
-    /**
-     * Plugin: webpack.DefinePlugin
-     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time.
-     *
-     * See: https://webpack.js.org/plugins/define-plugin/
-     */
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: config.prod.env
-      }
-    })
-  ]
+    plugins: [
+      /*
+       * Plugin: UglifyJsparallelPlugin
+       * Description: Identical to standard uglify webpack plugin
+       * with an option to build multiple files in parallel
+       *
+       * See: https://www.npmjs.com/package/webpack-uglify-parallel
+       */
+      new UglifyJsparallelPlugin({
+        workers: os.cpus().length,
+        mangle: true,
+        compressor: {
+          warnings: false,
+          drop_console: true,
+          drop_debugger: true
+        }
+      }),
+      // Need to run uglify first, then pipe other webpack plugins
+      ...commonConfig[1].plugins,
+      /**
+       * Plugin: webpack.DefinePlugin
+       * Description: The DefinePlugin allows you to create global constants which can be configured at compile time. 
+       *
+       * See: https://webpack.js.org/plugins/define-plugin/
+       */
+      new webpack.DefinePlugin({
+        'process.env': {
+          'NODE_ENV': config.prod.env
+        }
+      })
+    ]
 })
 
 /**
- * Webpack configuration for web.
- */
+* Webpack configuration for web.
+*/
 const webConfig = webpackMerge(commonConfig[0], {
   /**
    * Developer tool to enhance debugging
@@ -99,13 +99,13 @@ const webConfig = webpackMerge(commonConfig[0], {
   plugins: [
     /**
      * Plugin: webpack.DefinePlugin
-     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time.
+     * Description: The DefinePlugin allows you to create global constants which can be configured at compile time. 
      *
      * See: https://webpack.js.org/plugins/define-plugin/
      */
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: config.prod.env
+        'NODE_ENV': config.prod.env
       }
     }),
     /*
@@ -125,6 +125,6 @@ const webConfig = webpackMerge(commonConfig[0], {
       }
     })
   ]
-})
+});
 
 module.exports = [weexConfig, webConfig]
