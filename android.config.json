@@ -1,6 +1,0 @@
-{
-  "AppName": "2048",
-  "AppId": "top.yyydl.my2048",
-  "SplashText": "2048",
-  "WeexBundle": "index.js"
-}

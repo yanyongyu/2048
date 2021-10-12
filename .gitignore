@@ -1,4 +1,12 @@
-.temp/
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+.DS_Store
 
 # Created by https://www.toptal.com/developers/gitignore/api/node,yarn,vuejs,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,yarn,vuejs,visualstudiocode

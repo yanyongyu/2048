@@ -1,9 +1,0 @@
-{
-  "AppName": "2048",
-  "Version": "0.1",
-  "BuildVersion": "0.1.0",
-  "AppId": "top.yyydl.my2048",
-  "CodeSign": "",
-  "Profile": "",
-  "WeexBundle": "index.js"
-}
