@@ -1,6 +1,6 @@
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
-const ip = require('ip').address();
+const ip = process.env.IP || require('ip').address();
 const config = {
   root: ROOT,
   // webpack-dev-server
