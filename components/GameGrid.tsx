@@ -2,18 +2,55 @@ import * as React from "react";
 
 import { StyleSheet, View } from "react-native";
 
-import { TYPES } from "../types";
+import { RangeOf, TYPES } from "../types";
+
+function Tile<T extends typeof TYPES[number]>({
+  row,
+  col,
+  type,
+  number,
+}: {
+  row: RangeOf<T>;
+  col: RangeOf<T>;
+  type: T;
+  number: Number;
+}): JSX.Element {
+  return (
+    <View
+      style={[
+        styles.tile,
+        styles[`tileRow${type}${row}`],
+        styles[`tileCol${type}${col}`],
+      ]}
+    ></View>
+  );
+}
 
 export function GameGrid({
   type = 4,
+  disabled = false,
+  randomNumber = 2,
+  randomRange = 1,
 }: {
   type?: typeof TYPES[number];
+  disabled?: Boolean;
+  randomNumber?: number;
+  randomRange?: number;
 }): JSX.Element {
   const rowStyles = [styles.gridRow, styles[`gridRow${type}`]];
   const colStyles = [styles.gridCol, styles[`gridCol${type}`]];
 
+  const onMoveShouldSetResponder = () => true;
+  const onResponderRelease = () => {
+    console.log("onResponderRelease");
+  };
+
   return (
-    <View style={[styles.gameWrapper, styles[`gameWrapper${type}`]]}>
+    <View
+      style={[styles.gameWrapper, styles[`gameWrapper${type}`]]}
+      onMoveShouldSetResponder={onMoveShouldSetResponder}
+      onResponderRelease={onResponderRelease}
+    >
       {[...Array(type)].map((_, row) => (
         <View
           key={`row-${row}`}
@@ -35,6 +72,7 @@ export function GameGrid({
           ))}
         </View>
       ))}
+      <View style={styles.tileContainer}></View>
     </View>
   );
 }
@@ -131,4 +169,9 @@ const styles = StyleSheet.create({
     width: widthPresets[8],
     marginRight: marginPresets[8],
   },
+
+  tileContainer: {
+    position: "absolute",
+  },
+  tile: {},
 });
