@@ -60,3 +60,17 @@ export type RangeOf2<From extends number, To extends number> =
   | From;
 
 export const TYPES = [3, 4, 5, 6, 8] as const;
+export const NUMBERS = [
+  2,
+  4,
+  8,
+  16,
+  32,
+  64,
+  128,
+  256,
+  512,
+  1024,
+  2048,
+  "Super",
+] as const;

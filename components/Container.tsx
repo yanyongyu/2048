@@ -18,6 +18,8 @@ const styles = StyleSheet.create({
   wrapper: {
     width: "100%",
     height: "100%",
+    paddingLeft: 30,
+    paddingRight: 30,
     color: "#776e65",
     backgroundColor: "#faf8ef",
     alignItems: "center",
@@ -25,8 +27,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: "100%",
-    maxWidth: "500px",
-    margin: 20,
+    maxWidth: 500,
     alignItems: "center",
   },
 });

@@ -1,13 +1,7 @@
 import * as React from "react";
 
 import { RootStackScreenProps, TYPES } from "../types";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { Container } from "../components/Container";
 import { FontAwesome } from "@expo/vector-icons";
@@ -89,6 +83,7 @@ const styles = StyleSheet.create({
   slice: {
     width: "100%",
     flexDirection: "row",
+    alignItems: "center",
   },
   sliceItem: {
     flex: 1,
@@ -101,16 +96,16 @@ const styles = StyleSheet.create({
 
   action: {
     width: "100%",
-    padding: 50,
+    marginTop: 30,
   },
   actionButton: {
     width: "100%",
     padding: 6,
     backgroundColor: "#f58461",
-    textAlign: "center",
   },
   actionText: {
     fontSize: 20,
     color: "#ffffff",
+    textAlign: "center",
   },
 });
