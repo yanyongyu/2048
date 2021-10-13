@@ -16,7 +16,8 @@ function ScoreView({
   return (
     <View style={styles.scoreWrapper}>
       <View style={styles.scoreContainer}>
-        <Text>{title}</Text>
+        <Text style={styles.scoreTitle}>{title}</Text>
+        <Text style={styles.scoreText}>{score}</Text>
       </View>
     </View>
   );
@@ -41,9 +42,13 @@ export default function Game({
           <View style={styles.toolBar}></View>
         </View>
       </View>
-      <View>
+      <View style={styles.gameContainer}>
         <GameGrid type={type as typeof TYPES[number]} />
       </View>
+      <Text>
+        HOW TO PLAY: Swipe with your fingers to move the tiles. Tiles with the
+        same number merge into one when they touch. Add them up to reach 2048!
+      </Text>
     </Container>
   );
 }
@@ -76,9 +81,23 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.3)",
     padding: 10,
   },
+  scoreTitle: {
+    textTransform: "uppercase",
+    color: "rgba(255, 255, 255, 0.3)",
+  },
+  scoreText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+  },
 
   toolBar: {
     flex: 1,
     flexDirection: "row",
+  },
+
+  gameContainer: {
+    minHeight: 400,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
