@@ -3,21 +3,23 @@ import * as React from "react";
 import { NUMBERS, RangeOf, TYPES } from "../types";
 import { StyleSheet, Text, View } from "react-native";
 
-function Tile<T extends typeof TYPES[number]>({
+type TileProps = {
+  row: Number;
+  col: Number;
+  generated?: Boolean;
+  merged?: Boolean;
+  type: Number;
+  number: Number;
+};
+
+function Tile({
   row,
   col,
   type,
   generated = false,
   merged = false,
   number,
-}: {
-  row: RangeOf<T>;
-  col: RangeOf<T>;
-  generated?: Boolean;
-  merged?: Boolean;
-  type: T;
-  number: Number;
-}): JSX.Element {
+}: TileProps): JSX.Element {
   return (
     <View
       style={[
@@ -50,7 +52,7 @@ export function GameGrid({
   type = 4,
   disabled = false,
   randomNumber = 2,
-  randomRange = 1,
+  randomRange: defaultRandomRange = 1,
 }: {
   type?: typeof TYPES[number];
   disabled?: Boolean;
@@ -59,6 +61,47 @@ export function GameGrid({
 }): JSX.Element {
   const rowStyles = [styles.gridRow, styles[`gridRow${type}`]];
   const colStyles = [styles.gridCol, styles[`gridCol${type}`]];
+  const [randomRange, setRandomRange] =
+    React.useState<Number>(defaultRandomRange);
+  const [tiles, setTiles] = React.useState<Array<TileProps>>([
+    { row: 0, col: 0, type: 4, number: 2 },
+    { row: 0, col: 1, type: 4, number: 2 },
+    { row: 0, col: 2, type: 4, number: 2 },
+    { row: 0, col: 3, type: 4, number: 2 },
+    { row: 1, col: 0, type: 4, number: 2 },
+    { row: 1, col: 1, type: 4, number: 2 },
+    { row: 1, col: 2, type: 4, number: 2 },
+    { row: 1, col: 3, type: 4, number: 2 },
+    { row: 2, col: 0, type: 4, number: 2 },
+    { row: 2, col: 1, type: 4, number: 2 },
+    { row: 2, col: 2, type: 4, number: 2 },
+    { row: 2, col: 3, type: 4, number: 2 },
+  ]);
+  const tileMatrix = Array(type)
+    .fill(0)
+    .map((x) => Array(type).fill(0));
+  tiles.map((tile) => {
+    tileMatrix[tile.row][tile.col] = tile.number;
+  });
+
+  const findAvailableCells = () => {
+    const result: Array<{ row: Number; col: Number }> = [];
+    tileMatrix.map((row) => {
+      row.map((tile) => {
+        if (!tile) {
+          result.push({ row: tile.row, col: tile.col });
+        }
+      });
+    });
+    return result;
+  };
+
+  const randomAvailableCell = () => {
+    const cells = findAvailableCells();
+    if (cells.length) {
+      return cells[Math.floor(Math.random() * cells.length)];
+    }
+  };
 
   const onMoveShouldSetResponder = () => true;
   const onResponderRelease = () => {
@@ -93,18 +136,9 @@ export function GameGrid({
         </View>
       ))}
       <View style={styles.tileContainer}>
-        <Tile row={0} col={0} type={type} number={2} />
-        <Tile row={0} col={1} type={type} number={4} />
-        <Tile row={0} col={2} type={type} number={8} />
-        <Tile row={0} col={3} type={type} number={16} />
-        <Tile row={1} col={0} type={type} number={32} />
-        <Tile row={1} col={1} type={type} number={64} />
-        <Tile row={1} col={2} type={type} number={128} />
-        <Tile row={1} col={3} type={type} number={256} />
-        <Tile row={2} col={0} type={type} number={512} />
-        <Tile row={2} col={1} type={type} number={1024} />
-        <Tile row={2} col={2} type={type} number={2048} />
-        <Tile row={2} col={3} type={type} number={4096} />
+        {tiles.map((tile) => (
+          <Tile {...tile}></Tile>
+        ))}
       </View>
     </View>
   );
