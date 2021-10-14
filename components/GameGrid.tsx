@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { NUMBERS, RangeOf, TYPES } from "../types";
+import { NUMBERS, RangeOf, SIZES } from "../types";
 import { StyleSheet, Text, View } from "react-native";
 
 type TileProps = {
@@ -54,7 +54,7 @@ export function GameGrid({
   randomNumber = 2,
   randomRange: defaultRandomRange = 1,
 }: {
-  type?: typeof TYPES[number];
+  type?: typeof SIZES[number];
   disabled?: Boolean;
   randomNumber?: number;
   randomRange?: number;
@@ -247,7 +247,7 @@ const stylesheet: StyleSheet.NamedStyles<{ [key: string]: any }> = {
   },
 };
 
-for (const type of TYPES) {
+for (const type of SIZES) {
   stylesheet[`gameWrapper${type}`] = { padding: marginPresets[type] };
   stylesheet[`gridRow${type}`] = {
     height: widthPresets[type],

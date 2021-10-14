@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { RootStackScreenProps, TYPES } from "../types";
+import { RootStackScreenProps, SIZES } from "../types";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { Container } from "../components/Container";
@@ -19,7 +19,7 @@ export default function Home({
   };
 
   const next = () => {
-    if (index < TYPES.length - 1) {
+    if (index < SIZES.length - 1) {
       setIndex(index + 1);
     }
   };
@@ -30,7 +30,7 @@ export default function Home({
         <Text style={styles.title}>2048</Text>
       </View>
       <View style={styles.gameContainer}>
-        <GameGrid type={TYPES[index]} />
+        <GameGrid type={SIZES[index]} />
       </View>
       <View style={styles.slice}>
         <TouchableOpacity
@@ -42,7 +42,7 @@ export default function Home({
         </TouchableOpacity>
         <View style={styles.sliceItem}>
           <Text style={styles.sliceText}>
-            {TYPES[index]} x {TYPES[index]}
+            {SIZES[index]} x {SIZES[index]}
           </Text>
         </View>
         <TouchableOpacity
@@ -57,7 +57,7 @@ export default function Home({
         <TouchableOpacity
           style={styles.actionButton}
           activeOpacity={0.5}
-          onPress={() => navigation.push("Game", { type: TYPES[index] })}
+          onPress={() => navigation.push("Game", { type: SIZES[index] })}
         >
           <Text style={styles.actionText}>开始游戏</Text>
         </TouchableOpacity>

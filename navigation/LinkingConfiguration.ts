@@ -11,7 +11,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Game: {
         path: "game/:type",
         parse: {
-          type: Number,
+          size: Number,
         },
       },
     },

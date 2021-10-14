@@ -1,6 +1,8 @@
 import * as React from "react";
 
-import { RootStackScreenProps, TYPES } from "../types";
+import { GridContext, useGridController } from "../hooks/useGridController";
+import { RootStackScreenProps, SIZES } from "../types";
+import { ScoreContext, useScoreController } from "../hooks/useScoreController";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Container } from "../components/Container";
@@ -26,31 +28,38 @@ export default function Game({
   navigation,
   route,
 }: RootStackScreenProps<"Game">): JSX.Element {
-  const { type } = route.params;
+  const { size } = route.params;
+  const scoreController = useScoreController();
+  const gridController = useGridController(size);
+
   return (
-    <Container>
-      <View style={styles.heading}>
-        <View style={styles.headingItem}>
-          <Text style={styles.headingText}>2048</Text>
-        </View>
-        <View style={styles.headingItem}>
-          <View style={styles.scoreBar}>
-            <ScoreView title="Score" score={0} />
-            <ScoreView title="Best" score={0} />
+    <ScoreContext.Provider value={scoreController}>
+      <GridContext.Provider value={gridController}>
+        <Container>
+          <View style={styles.heading}>
+            <View style={styles.headingItem}>
+              <Text style={styles.headingText}>2048</Text>
+            </View>
+            <View style={styles.headingItem}>
+              <View style={styles.scoreBar}>
+                <ScoreView title="Score" score={scoreController.score} />
+                <ScoreView title="Best" score={scoreController.best} />
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-      <View style={styles.gameContainer}>
-        <GameGrid type={type as typeof TYPES[number]} />
-      </View>
-      <Text style={styles.tips}>
-        <Text style={styles.tipsBold}>HOW TO PLAY</Text>: Swipe with{" "}
-        <Text style={styles.tipsBold}>your fingers</Text> to move the tiles.
-        Tiles with the same number{" "}
-        <Text style={styles.tipsBold}>merge into one</Text> when they touch. Add
-        them up to reach <Text style={styles.tipsBold}>2048</Text>!
-      </Text>
-    </Container>
+          <View style={styles.gameContainer}>
+            <GameGrid type={size as typeof SIZES[number]} />
+          </View>
+          <Text style={styles.tips}>
+            <Text style={styles.tipsBold}>HOW TO PLAY</Text>: Swipe with{" "}
+            <Text style={styles.tipsBold}>your fingers</Text> to move the tiles.
+            Tiles with the same number{" "}
+            <Text style={styles.tipsBold}>merge into one</Text> when they touch.
+            Add them up to reach <Text style={styles.tipsBold}>2048</Text>!
+          </Text>
+        </Container>
+      </GridContext.Provider>
+    </ScoreContext.Provider>
   );
 }
 

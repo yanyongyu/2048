@@ -9,7 +9,7 @@ declare global {
 export type RootStackParamList = {
   Home: undefined;
   Game: {
-    type: Number;
+    size: typeof SIZES[number];
   };
 };
 
@@ -21,7 +21,7 @@ export type RangeOf<
   A extends number[] = []
 > = A["length"] extends N ? A : RangeOf<N, [...A, A["length"]]>;
 
-export const TYPES = [3, 4, 5, 6, 8] as const;
+export const SIZES = [3, 4, 5, 6, 8] as const;
 export const NUMBERS = [
   2,
   4,
