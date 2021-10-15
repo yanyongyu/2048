@@ -7,6 +7,11 @@ type ScoreContextProps = {
   setBest: (best: number) => void;
 };
 
+type ScoreChangeProps = {
+  queue: Array<number>;
+  popScore: () => void;
+};
+
 export const ScoreContext = React.createContext<ScoreContextProps | undefined>(
   undefined
 );
@@ -15,4 +20,15 @@ export function useScoreController(): ScoreContextProps {
   const [score, setScore] = React.useState<number>(0);
   const [best, setBest] = React.useState<number>(0);
   return { score, setScore, best, setBest };
+}
+
+export function useScoreChange(): ScoreChangeProps {
+  const [queue, setQueue] = React.useState<Array<number>>([]);
+  return {
+    queue,
+    popScore: () => {
+      queue.shift();
+      setQueue(queue);
+    },
+  };
 }
