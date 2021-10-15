@@ -1,7 +1,6 @@
-import { file } from "@babel/types";
 import * as React from "react";
 
-import { SIZES } from "../types";
+import { useSize } from "./useSizeContext";
 
 type Position = { x: number; y: number };
 const enum Direction {
@@ -29,9 +28,8 @@ export const GridContext = React.createContext<GridContextProps | undefined>(
   undefined
 );
 
-export function useGridController(
-  size: typeof SIZES[number]
-): GridContextProps {
+export function useGridController(): GridContextProps {
+  const size = useSize();
   const [cells, setCells] = React.useState<Array<Array<Tile | null>>>(
     Array(size)
       .fill(0)

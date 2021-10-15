@@ -1,7 +1,9 @@
 import * as React from "react";
 
-import { NUMBERS, RangeOf, SIZES } from "../types";
+import { NUMBERS, SIZES } from "../types";
 import { StyleSheet, Text, View } from "react-native";
+
+import { useSize } from "../hooks/useSizeContext";
 
 type TileProps = {
   row: Number;
@@ -49,18 +51,17 @@ function Tile({
 }
 
 export function GameGrid({
-  type = 4,
   disabled = false,
   randomNumber = 2,
   randomRange: defaultRandomRange = 1,
 }: {
-  type?: typeof SIZES[number];
   disabled?: Boolean;
   randomNumber?: number;
   randomRange?: number;
 }): JSX.Element {
-  const rowStyles = [styles.gridRow, styles[`gridRow${type}`]];
-  const colStyles = [styles.gridCol, styles[`gridCol${type}`]];
+  const size = useSize();
+  const rowStyles = [styles.gridRow, styles[`gridRow${size}`]];
+  const colStyles = [styles.gridCol, styles[`gridCol${size}`]];
   const [randomRange, setRandomRange] =
     React.useState<Number>(defaultRandomRange);
   const [tiles, setTiles] = React.useState<Array<TileProps>>([
@@ -77,9 +78,9 @@ export function GameGrid({
     { row: 2, col: 2, type: 4, number: 2 },
     { row: 2, col: 3, type: 4, number: 2 },
   ]);
-  const tileMatrix = Array(type)
+  const tileMatrix = Array(size)
     .fill(0)
-    .map((x) => Array(type).fill(0));
+    .map((x) => Array(size).fill(0));
   tiles.map((tile) => {
     tileMatrix[tile.row][tile.col] = tile.number;
   });
@@ -110,24 +111,24 @@ export function GameGrid({
 
   return (
     <View
-      style={[styles.gameWrapper, styles[`gameWrapper${type}`]]}
+      style={[styles.gameWrapper, styles[`gameWrapper${size}`]]}
       onMoveShouldSetResponder={onMoveShouldSetResponder}
       onResponderRelease={onResponderRelease}
     >
-      {[...Array(type)].map((_, row) => (
+      {[...Array(size)].map((_, row) => (
         <View
           key={`row-${row}`}
           style={
-            row === type - 1
+            row === size - 1
               ? [...rowStyles, styles.gridRowNoBottom]
               : rowStyles
           }
         >
-          {[...Array(type)].map((_, col) => (
+          {[...Array(size)].map((_, col) => (
             <View
               key={`col-${col}`}
               style={
-                col === type - 1
+                col === size - 1
                   ? [...colStyles, styles.gridColNoRight]
                   : colStyles
               }
