@@ -23,6 +23,7 @@ type GridContextProps = {
   getTiles: () => Array<Tile>;
   addRandomTile: () => void;
   prepareTiles: () => void;
+  moveTile: (tile: Tile, cell: Position) => void;
   move: (direction: Direction) => void;
   saveState: () => void;
 };
@@ -134,6 +135,7 @@ export function useGridController(): GridContextProps {
     getTiles,
     addRandomTile,
     prepareTiles,
+    moveTile,
     move,
     saveState,
   };

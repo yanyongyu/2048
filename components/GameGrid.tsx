@@ -19,7 +19,7 @@ export function GameGrid({
   disabled?: Boolean;
 }): JSX.Element {
   const { size } = useSizeContext();
-  const { getTiles } = useGridControllerContext();
+  const { getTiles, saveState, moveTile } = useGridControllerContext();
   const rowStyles = [styles.gridRow, styles[`gridRow${size}`]];
   const colStyles = [styles.gridCol, styles[`gridCol${size}`]];
 
@@ -31,6 +31,7 @@ export function GameGrid({
       event.nativeEvent.velocityX,
       event.nativeEvent.velocityY
     );
+    saveState();
   };
 
   return (

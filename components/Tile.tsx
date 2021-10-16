@@ -16,6 +16,7 @@ export function Tile({
   const tileMerged: boolean = !!mergedFrom;
   const tileNew: boolean = !tileMerged && !previousPosition;
 
+  // define animates
   const animateMove = React.useRef(
     new Animated.ValueXY({
       x: x * widthPresets[size] + (x + 1) * marginPresets[size],
@@ -24,16 +25,14 @@ export function Tile({
   ).current;
   const previous = React.useRef({ x, y }).current;
   const newAnimationMove = () => {
-    if (x !== previous.x || y !== previous.y) {
-      Animated.timing(animateMove, {
-        toValue: {
-          x: x * widthPresets[size] + (x + 1) * marginPresets[size],
-          y: y * widthPresets[size] + (y + 1) * marginPresets[size],
-        },
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: false,
-      }).start();
-    }
+    Animated.timing(animateMove, {
+      toValue: {
+        x: x * widthPresets[size] + (x + 1) * marginPresets[size],
+        y: y * widthPresets[size] + (y + 1) * marginPresets[size],
+      },
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: false,
+    }).start();
   };
   const animateAppear = React.useRef(new Animated.Value(0)).current;
   const newAnimationAppear = () => {
@@ -45,11 +44,17 @@ export function Tile({
     }).start();
   };
 
+  // do animates
   React.useEffect(() => {
     if (tileNew || tileMerged) {
       newAnimationAppear();
     }
   }, []);
+  React.useEffect(() => {
+    if (x !== previous.x || y !== previous.y) {
+      newAnimationMove();
+    }
+  }, [x, y]);
 
   return (
     <Animated.View
