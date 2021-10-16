@@ -6,11 +6,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Container } from "../components/Container";
 import { FontAwesome } from "@expo/vector-icons";
 import { GameGrid } from "../components/GameGrid";
+import { useSizeIndex } from "../hooks/useSizeContext";
 
 export default function Home({
   navigation,
 }: RootStackScreenProps<"Home">): JSX.Element {
-  const [index, setIndex] = React.useState<number>(1);
+  const { index, setIndex } = useSizeIndex();
 
   const previous = () => {
     if (index > 0) {
@@ -30,7 +31,7 @@ export default function Home({
         <Text style={styles.title}>2048</Text>
       </View>
       <View style={styles.gameContainer}>
-        <GameGrid type={SIZES[index]} />
+        <GameGrid key="home" disabled={true} />
       </View>
       <View style={styles.slice}>
         <TouchableOpacity
@@ -57,7 +58,7 @@ export default function Home({
         <TouchableOpacity
           style={styles.actionButton}
           activeOpacity={0.5}
-          onPress={() => navigation.push("Game", { type: SIZES[index] })}
+          onPress={() => navigation.push("Game")}
         >
           <Text style={styles.actionText}>开始游戏</Text>
         </TouchableOpacity>

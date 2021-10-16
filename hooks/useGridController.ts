@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useSize } from "./useSizeContext";
+import { useSizeContext } from "./useSizeContext";
 
 export type Position = { x: number; y: number };
 export const enum Direction {
@@ -21,6 +21,10 @@ type GridContextProps = {
   cells: Array<Array<Tile | null>>;
   reset: () => void;
   getTiles: () => Array<Tile>;
+  addRandomTile: () => void;
+  prepareTiles: () => void;
+  move: (direction: Direction) => void;
+  saveState: () => void;
 };
 
 export const GridContext = React.createContext<GridContextProps | undefined>(
@@ -28,7 +32,7 @@ export const GridContext = React.createContext<GridContextProps | undefined>(
 );
 
 export function useGridController(): GridContextProps {
-  const size = useSize();
+  const { size } = useSizeContext();
   const [cells, setCells] = React.useState<Array<Array<Tile | null>>>(
     Array(size)
       .fill(0)
@@ -86,7 +90,7 @@ export function useGridController(): GridContextProps {
     );
   };
   const saveState = () => {
-    setCells(cells);
+    setCells([...cells.map((x) => [...x])]);
   };
 
   const getTiles = () => {
@@ -128,6 +132,10 @@ export function useGridController(): GridContextProps {
     cells,
     reset,
     getTiles,
+    addRandomTile,
+    prepareTiles,
+    move,
+    saveState,
   };
 }
 

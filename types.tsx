@@ -8,9 +8,7 @@ declare global {
 
 export type RootStackParamList = {
   Home: undefined;
-  Game: {
-    size: typeof SIZES[number];
-  };
+  Game: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =

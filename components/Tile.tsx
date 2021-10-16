@@ -4,8 +4,7 @@ import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { NUMBERS, SIZES } from "../types";
 
 import { Tile as TileProps } from "../hooks/useGridController";
-import { useSemaphoreContext } from "../hooks/useSemaphore";
-import { useSize } from "../hooks/useSizeContext";
+import { useSizeContext } from "../hooks/useSizeContext";
 
 export function Tile({
   position: { x, y },
@@ -13,76 +12,113 @@ export function Tile({
   mergedFrom,
   value,
 }: TileProps): JSX.Element {
-  const size = useSize();
+  const { size } = useSizeContext();
   const tileMerged: boolean = !!mergedFrom;
   const tileNew: boolean = !tileMerged && !previousPosition;
-  const { acquire, release } = useSemaphoreContext();
 
+  const animateMove = React.useRef(
+    new Animated.ValueXY({
+      x: x * widthPresets[size] + (x + 1) * marginPresets[size],
+      y: y * widthPresets[size] + (y + 1) * marginPresets[size],
+    })
+  ).current;
+  const previous = React.useRef({ x, y }).current;
+  const newAnimationMove = () => {
+    if (x !== previous.x || y !== previous.y) {
+      Animated.timing(animateMove, {
+        toValue: {
+          x: x * widthPresets[size] + (x + 1) * marginPresets[size],
+          y: y * widthPresets[size] + (y + 1) * marginPresets[size],
+        },
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+  const animateAppear = React.useRef(new Animated.Value(0)).current;
   const newAnimationAppear = () => {
-    const value = new Animated.Value(0);
-    Animated.timing(value, {
+    Animated.timing(animateAppear, {
       toValue: 1,
       easing: Easing.ease,
       duration: 100,
       useNativeDriver: false,
-    }).start(() => release());
-    acquire();
-    return value;
+    }).start();
   };
-  let animateAppear = null;
-  if (tileNew || tileMerged) {
-    animateAppear = React.useRef(newAnimationAppear()).current;
-  }
+
+  React.useEffect(() => {
+    if (tileNew || tileMerged) {
+      newAnimationAppear();
+    }
+  }, []);
 
   return (
-    <View
+    <Animated.View
       style={[
         styles.tile,
-        styles[`tile${size}`],
-        styles[`tile${size}Position${x}${y}`],
+        {
+          width: widthPresets[size],
+          height: widthPresets[size],
+        },
+        {
+          transform: [
+            {
+              translateX: animateMove.x,
+            },
+            {
+              translateY: animateMove.y,
+            },
+          ],
+        },
       ]}
     >
       <Animated.View
         style={[
           styles.tileInner,
-          styles[value > 2048 ? "tileNumSuper" : `tileNum${value}`],
-          tileNew
-            ? [
-                styles.tileNew,
+          {
+            backgroundColor:
+              bgPresets[value as typeof NUMBERS[number]] || bgPresets.Super,
+          },
+          tileNew && [
+            styles.tileNew,
+            {
+              opacity: animateAppear,
+              transform: [
                 {
-                  opacity: animateAppear,
-                  transform: [
-                    {
-                      scale: animateAppear,
-                    },
-                  ],
+                  scale: animateAppear,
                 },
-              ]
-            : tileMerged
-            ? [
-                styles.tileMerged,
+              ],
+            },
+          ],
+          tileMerged && [
+            styles.tileMerged,
+            {
+              opacity: animateAppear,
+              transform: [
                 {
-                  opacity: animateAppear,
-                  transform: [
-                    {
-                      scale: animateAppear,
-                    },
-                  ],
+                  scale: animateAppear,
                 },
-              ]
-            : null,
+              ],
+            },
+          ],
         ]}
       >
         <Text
           style={[
             styles.tileText,
-            styles[value > 2048 ? "tileNumSuperText" : `tileNum${value}Text`],
+            {
+              fontSize:
+                fontPresets[value as typeof NUMBERS[number]] ||
+                fontPresets.Super,
+              color:
+                colorPresets[value as typeof NUMBERS[number]] ||
+                colorPresets.Super,
+            },
           ]}
         >
           {value}
         </Text>
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -143,7 +179,7 @@ export const bgPresets = {
   Super: "#3c3a33",
 } as const;
 
-const stylesheet: StyleSheet.NamedStyles<{ [key: string]: any }> = {
+const styles = StyleSheet.create({
   tile: {
     position: "absolute",
   },
@@ -161,37 +197,4 @@ const stylesheet: StyleSheet.NamedStyles<{ [key: string]: any }> = {
     fontWeight: "bold",
     textAlign: "center",
   },
-};
-
-for (const size of SIZES) {
-  stylesheet[`tile${size}`] = {
-    width: widthPresets[size],
-    height: widthPresets[size],
-  };
-  [...Array(size)].map((_, x) => {
-    [...Array(size)].map((_, y) => {
-      stylesheet[`tile${size}Position${x}${y}`] = {
-        transform: [
-          {
-            translateX: x * widthPresets[size] + (x + 1) * marginPresets[size],
-          },
-          {
-            translateY: y * widthPresets[size] + (y + 1) * marginPresets[size],
-          },
-        ],
-      };
-    });
-  });
-}
-
-for (const number of NUMBERS) {
-  stylesheet[`tileNum${number}`] = {
-    backgroundColor: bgPresets[number],
-  };
-  stylesheet[`tileNum${number}Text`] = {
-    fontSize: fontPresets[number],
-    color: colorPresets[number],
-  };
-}
-
-const styles = StyleSheet.create(stylesheet);
+});

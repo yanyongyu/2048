@@ -8,12 +8,7 @@ const linking: LinkingOptions<RootStackParamList> = {
   config: {
     screens: {
       Home: "",
-      Game: {
-        path: "game/:type",
-        parse: {
-          size: Number,
-        },
-      },
+      Game: "game",
     },
   },
 };
