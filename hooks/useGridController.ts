@@ -127,7 +127,9 @@ export function useGridController(): GridContextProps {
     updatePosition(tile, cell);
   };
   // TODO
-  const move = (direction: Direction) => {};
+  const move = (direction: Direction) => {
+    console.log(direction);
+  };
 
   return {
     cells,
