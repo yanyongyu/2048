@@ -1,6 +1,12 @@
 import * as React from "react";
 
-import { StyleSheet, Text, View } from "react-native";
+import {
+  GestureEvent,
+  HandlerStateChangeEvent,
+  PanGestureHandler,
+  PanGestureHandlerEventPayload,
+} from "react-native-gesture-handler";
+import { StyleSheet, View } from "react-native";
 import { Tile, marginPresets, widthPresets } from "./Tile";
 
 import { SIZES } from "../types";
@@ -17,44 +23,51 @@ export function GameGrid({
   const rowStyles = [styles.gridRow, styles[`gridRow${size}`]];
   const colStyles = [styles.gridCol, styles[`gridCol${size}`]];
 
-  const onMoveShouldSetResponder = () => true;
-  const onResponderRelease = () => {
-    console.log("onResponderRelease");
+  const onSwipeGesture = (
+    event: HandlerStateChangeEvent<Record<string, unknown>>
+  ) => {
+    console.log(
+      event.nativeEvent.state,
+      event.nativeEvent.velocityX,
+      event.nativeEvent.velocityY
+    );
   };
 
   return (
-    <View
-      style={[styles.gameWrapper, styles[`gameWrapper${size}`]]}
-      onMoveShouldSetResponder={onMoveShouldSetResponder}
-      onResponderRelease={onResponderRelease}
+    <PanGestureHandler
+      enabled={!disabled}
+      shouldCancelWhenOutside={true}
+      onEnded={onSwipeGesture}
     >
-      {[...Array(size)].map((_, row) => (
-        <View
-          key={`row-${row}`}
-          style={
-            row === size - 1
-              ? [...rowStyles, styles.gridRowNoBottom]
-              : rowStyles
-          }
-        >
-          {[...Array(size)].map((_, col) => (
-            <View
-              key={`col-${col}`}
-              style={
-                col === size - 1
-                  ? [...colStyles, styles.gridColNoRight]
-                  : colStyles
-              }
-            ></View>
+      <View style={[styles.gameWrapper, styles[`gameWrapper${size}`]]}>
+        {[...Array(size)].map((_, row) => (
+          <View
+            key={`row-${row}`}
+            style={
+              row === size - 1
+                ? [...rowStyles, styles.gridRowNoBottom]
+                : rowStyles
+            }
+          >
+            {[...Array(size)].map((_, col) => (
+              <View
+                key={`col-${col}`}
+                style={
+                  col === size - 1
+                    ? [...colStyles, styles.gridColNoRight]
+                    : colStyles
+                }
+              ></View>
+            ))}
+          </View>
+        ))}
+        <View style={styles.tileContainer}>
+          {getTiles().map((tile, index) => (
+            <Tile key={`tile-${index}`} {...tile} />
           ))}
         </View>
-      ))}
-      <View style={styles.tileContainer}>
-        {getTiles().map((tile, index) => (
-          <Tile key={`tile-${index}`} {...tile} />
-        ))}
       </View>
-    </View>
+    </PanGestureHandler>
   );
 }
 
