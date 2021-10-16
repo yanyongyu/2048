@@ -32,3 +32,11 @@ export function useScoreChange(): ScoreChangeProps {
     },
   };
 }
+
+export function useScoreControllerContext(): ScoreContextProps {
+  const value = React.useContext(ScoreContext);
+  if (value == null) {
+    throw new Error("use score controller outside of score context");
+  }
+  return value;
+}

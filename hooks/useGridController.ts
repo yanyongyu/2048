@@ -2,15 +2,15 @@ import * as React from "react";
 
 import { useSize } from "./useSizeContext";
 
-type Position = { x: number; y: number };
-const enum Direction {
+export type Position = { x: number; y: number };
+export const enum Direction {
   up,
   right,
   down,
   left,
 }
 
-type Tile = {
+export type Tile = {
   position: Position;
   value: number;
   previousPosition?: Position;
@@ -20,8 +20,7 @@ type Tile = {
 type GridContextProps = {
   cells: Array<Array<Tile | null>>;
   reset: () => void;
-  availableCells: () => Array<Position>;
-  randomAvailableCell: () => Position | undefined;
+  getTiles: () => Array<Tile>;
 };
 
 export const GridContext = React.createContext<GridContextProps | undefined>(
@@ -90,6 +89,15 @@ export function useGridController(): GridContextProps {
     setCells(cells);
   };
 
+  const getTiles = () => {
+    const tiles: Array<Tile> = [];
+    eachCell((x, y, tile) => {
+      if (tile) {
+        tiles.push(tile);
+      }
+    });
+    return tiles;
+  };
   const addRandomTile = () => {
     const position = randomAvailableCell();
     if (position !== undefined) {
@@ -119,7 +127,14 @@ export function useGridController(): GridContextProps {
   return {
     cells,
     reset,
-    availableCells,
-    randomAvailableCell,
+    getTiles,
   };
+}
+
+export function useGridControllerContext(): GridContextProps {
+  const value = React.useContext(GridContext);
+  if (value == null) {
+    throw new Error("use grid controller outside of grid context");
+  }
+  return value;
 }
