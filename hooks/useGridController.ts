@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { useScoreControllerContext } from "./useScoreController";
 import { useSizeContext } from "./useSizeContext";
 
 export type Position = { x: number; y: number };
@@ -34,20 +35,22 @@ export const GridContext = React.createContext<GridContextProps | undefined>(
 
 export function useGridController(): GridContextProps {
   const { size } = useSizeContext();
+  const { over, setOver, reset: resetScore } = useScoreControllerContext();
   const [cells, setCells] = React.useState<Array<Array<Tile | null>>>(
     Array(size)
       .fill(0)
       .map((x) => Array(size).fill(null))
   );
 
+  // tool functions
   const reset = () => {
     setCells(
       Array(size)
         .fill(0)
         .map((x) => Array(size).fill(null))
     );
+    resetScore();
   };
-
   const eachCell = (
     callback: (x: number, y: number, tile: Tile | null) => void
   ) => {
@@ -57,6 +60,9 @@ export function useGridController(): GridContextProps {
       });
     });
   };
+  const withinBounds = (cell: Position) => {
+    return cell.x >= 0 && cell.x < size && cell.y >= 0 && cell.y < size;
+  };
   const availableCells = () => {
     const cells: Array<Position> = [];
     eachCell((x, y, tile) => {
@@ -65,6 +71,22 @@ export function useGridController(): GridContextProps {
       }
     });
     return cells;
+  };
+  const cellContent = (cell: Position) => {
+    if (withinBounds(cell)) {
+      return cells[cell.x][cell.y];
+    } else {
+      return null;
+    }
+  };
+  const cellOccupied = (cell: Position) => {
+    return !!cellContent(cell);
+  };
+  const cellAvailable = (cell: Position) => {
+    return !cellOccupied(cell);
+  };
+  const cellsAvailable = () => {
+    return !!availableCells().length;
   };
   const randomAvailableCell = () => {
     const cells = availableCells();
@@ -89,6 +111,34 @@ export function useGridController(): GridContextProps {
       first.position.x === second.position.x &&
       first.position.y === second.position.y
     );
+  };
+  const getVector = (direction: Direction) => {
+    const map = {
+      0: { x: 0, y: -1 }, // Up
+      1: { x: 1, y: 0 }, // Right
+      2: { x: 0, y: 1 }, // Down
+      3: { x: -1, y: 0 }, // Left
+    };
+    return map[direction];
+  };
+  const buildTraversals = (vector: Position) => {
+    const traversals: { x: number[]; y: number[] } = { x: [], y: [] };
+    [...Array(size)].forEach((_, index) => {
+      traversals.x.push(index);
+      traversals.y.push(index);
+    });
+    return traversals;
+  };
+  const findFarthestPosition = (cell: Position, vector: Position) => {
+    let previous;
+    do {
+      previous = cell;
+      cell = { x: previous.x + vector.x, y: previous.y + vector.y };
+    } while (withinBounds(cell) && cellAvailable(cell));
+    return {
+      farthest: previous,
+      next: cell,
+    };
   };
   const saveState = () => {
     setCells([...cells.map((x) => [...x])]);
@@ -129,6 +179,8 @@ export function useGridController(): GridContextProps {
   // TODO
   const move = (direction: Direction) => {
     console.log(direction);
+    if (over) return;
+    prepareTiles();
   };
 
   return {

@@ -5,7 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { Container } from "../components/Container";
 import { FontAwesome } from "@expo/vector-icons";
-import { GameGrid } from "../components/GameGrid";
+import { Grid } from "../components/Grid";
 import { useSizeIndex } from "../hooks/useSizeContext";
 
 export default function Home({
@@ -31,7 +31,7 @@ export default function Home({
         <Text style={styles.title}>2048</Text>
       </View>
       <View style={styles.gameContainer}>
-        <GameGrid key="home" disabled={true} />
+        <Grid />
       </View>
       <View style={styles.slice}>
         <TouchableOpacity

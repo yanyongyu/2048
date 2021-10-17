@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { GridContext, useGridController } from "../hooks/useGridController";
 import { RootStackScreenProps, SIZES } from "../types";
 import { ScoreContext, useScoreController } from "../hooks/useScoreController";
 import { StyleSheet, Text, View } from "react-native";
@@ -7,7 +8,6 @@ import { StyleSheet, Text, View } from "react-native";
 import { Container } from "../components/Container";
 import { GameGrid } from "../components/GameGrid";
 import { useFocusEffect } from "@react-navigation/native";
-import { useGridControllerContext } from "../hooks/useGridController";
 
 function ScoreView({
   title,
@@ -28,7 +28,8 @@ export default function Game({
   navigation,
 }: RootStackScreenProps<"Game">): JSX.Element {
   const scoreController = useScoreController();
-  const { reset, addRandomTile, saveState } = useGridControllerContext();
+  const gridController = useGridController();
+  const { reset, addRandomTile, saveState } = gridController;
 
   // setup and cleanup
   useFocusEffect(
@@ -43,29 +44,31 @@ export default function Game({
 
   return (
     <ScoreContext.Provider value={scoreController}>
-      <Container>
-        <View style={styles.heading}>
-          <View style={styles.headingItem}>
-            <Text style={styles.headingText}>2048</Text>
-          </View>
-          <View style={styles.headingItem}>
-            <View style={styles.scoreBar}>
-              <ScoreView title="Score" score={scoreController.score} />
-              <ScoreView title="Best" score={scoreController.best} />
+      <GridContext.Provider value={gridController}>
+        <Container>
+          <View style={styles.heading}>
+            <View style={styles.headingItem}>
+              <Text style={styles.headingText}>2048</Text>
+            </View>
+            <View style={styles.headingItem}>
+              <View style={styles.scoreBar}>
+                <ScoreView title="Score" score={scoreController.score} />
+                <ScoreView title="Best" score={scoreController.best} />
+              </View>
             </View>
           </View>
-        </View>
-        <View style={styles.gameContainer}>
-          <GameGrid key="game" />
-        </View>
-        <Text style={styles.tips}>
-          <Text style={styles.tipsBold}>HOW TO PLAY</Text>: Swipe with{" "}
-          <Text style={styles.tipsBold}>your fingers</Text> to move the tiles.
-          Tiles with the same number{" "}
-          <Text style={styles.tipsBold}>merge into one</Text> when they touch.
-          Add them up to reach <Text style={styles.tipsBold}>2048</Text>!
-        </Text>
-      </Container>
+          <View style={styles.gameContainer}>
+            <GameGrid />
+          </View>
+          <Text style={styles.tips}>
+            <Text style={styles.tipsBold}>HOW TO PLAY</Text>: Swipe with{" "}
+            <Text style={styles.tipsBold}>your fingers</Text> to move the tiles.
+            Tiles with the same number{" "}
+            <Text style={styles.tipsBold}>merge into one</Text> when they touch.
+            Add them up to reach <Text style={styles.tipsBold}>2048</Text>!
+          </Text>
+        </Container>
+      </GridContext.Provider>
     </ScoreContext.Provider>
   );
 }
