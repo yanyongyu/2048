@@ -30,6 +30,7 @@ export function Tile({
         x: x * widthPresets[size] + (x + 1) * marginPresets[size],
         y: y * widthPresets[size] + (y + 1) * marginPresets[size],
       },
+      duration: 100,
       easing: Easing.inOut(Easing.ease),
       useNativeDriver: false,
     }).start();
@@ -43,11 +44,23 @@ export function Tile({
       useNativeDriver: false,
     }).start();
   };
+  const animatePop = React.useRef(new Animated.Value(0)).current;
+  const newAnimationPop = () => {
+    Animated.timing(animatePop, {
+      toValue: 1,
+      duration: 200,
+      delay: 100,
+      easing: Easing.bezier(0.34, 1.56, 0.64, 1),
+      useNativeDriver: false,
+    }).start();
+  };
 
   // do animates
   React.useEffect(() => {
-    if (tileNew || tileMerged) {
+    if (tileNew) {
       newAnimationAppear();
+    } else if (tileMerged) {
+      newAnimationPop();
     }
   }, []);
   React.useEffect(() => {
@@ -97,10 +110,9 @@ export function Tile({
           tileMerged && [
             styles.tileMerged,
             {
-              opacity: animateAppear,
               transform: [
                 {
-                  scale: animateAppear,
+                  scale: animatePop,
                 },
               ],
             },
@@ -193,10 +205,11 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 10,
   },
   tileNew: {},
   tileMerged: {
-    zIndex: 3,
+    zIndex: 20,
   },
   tileText: {
     fontWeight: "bold",

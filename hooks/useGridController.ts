@@ -1,7 +1,10 @@
+import "react-native-get-random-values";
+
 import * as React from "react";
 
 import { useScoreControllerContext } from "./useScoreController";
 import { useSizeContext } from "./useSizeContext";
+import { v4 as uuidv4 } from "uuid";
 
 export type Position = { x: number; y: number };
 export enum Direction {
@@ -16,6 +19,7 @@ export type Tile = {
   value: number;
   previousPosition?: Position;
   mergedFrom?: [Tile, Tile];
+  id: string;
 };
 
 type GridContextProps = {
@@ -192,6 +196,7 @@ export function useGridController(): GridContextProps {
       const tile: Tile = {
         position,
         value: Math.random() < 0.9 ? 2 : 4,
+        id: uuidv4(),
       };
       insertTile(tile);
     }
@@ -238,6 +243,7 @@ export function useGridController(): GridContextProps {
               position: positions.next,
               value: tile.value * 2,
               mergedFrom: [tile, next],
+              id: uuidv4(),
             };
 
             insertTile(merged);

@@ -36,8 +36,7 @@ export function Grid({ tiles }: { tiles?: TileProps[] }): JSX.Element {
         </View>
       ))}
       <View style={styles.tileContainer}>
-        {tiles &&
-          tiles.map((tile, index) => <Tile key={`tile-${index}`} {...tile} />)}
+        {tiles && tiles.map((tile) => <Tile key={tile.id} {...tile} />)}
       </View>
     </View>
   );
