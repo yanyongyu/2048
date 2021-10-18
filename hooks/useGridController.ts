@@ -4,11 +4,11 @@ import { useScoreControllerContext } from "./useScoreController";
 import { useSizeContext } from "./useSizeContext";
 
 export type Position = { x: number; y: number };
-export const enum Direction {
-  up,
-  right,
-  down,
-  left,
+export enum Direction {
+  up = "up",
+  right = "right",
+  down = "down",
+  left = "left",
 }
 
 export type Tile = {
@@ -35,7 +35,13 @@ export const GridContext = React.createContext<GridContextProps | undefined>(
 
 export function useGridController(): GridContextProps {
   const { size } = useSizeContext();
-  const { over, setOver, reset: resetScore } = useScoreControllerContext();
+  const {
+    score,
+    setScore,
+    over,
+    setOver,
+    reset: resetScore,
+  } = useScoreControllerContext();
   const [cells, setCells] = React.useState<Array<Array<Tile | null>>>(
     Array(size)
       .fill(0)
@@ -88,6 +94,31 @@ export function useGridController(): GridContextProps {
   const cellsAvailable = () => {
     return !!availableCells().length;
   };
+  const movesAvailable = () => {
+    return cellsAvailable() || tileMatchesAvailable();
+  };
+  const tileMatchesAvailable = () => {
+    let cell: Position,
+      vector: Position,
+      direction: Direction,
+      tile: Tile | null,
+      other: Tile | null;
+    [...Array(size)].forEach((_, x) => {
+      [...Array(size)].forEach((_, y) => {
+        tile = cellContent({ x, y });
+        if (tile) {
+          for (let d in Direction) {
+            direction = Direction[d as keyof typeof Direction];
+            vector = getVector(direction);
+            cell = { x: x + vector.x, y: y + vector.y };
+            other = cellContent(cell);
+            if (other && other.value === tile.value) return true;
+          }
+        }
+      });
+    });
+    return false;
+  };
   const randomAvailableCell = () => {
     const cells = availableCells();
     if (!!cells.length) {
@@ -106,18 +137,15 @@ export function useGridController(): GridContextProps {
   const savePosition = (tile: Tile) => {
     tile.previousPosition = { ...tile.position };
   };
-  const positionEqual = (first: Tile, second: Tile) => {
-    return (
-      first.position.x === second.position.x &&
-      first.position.y === second.position.y
-    );
+  const positionEqual = (first: Position, second: Position) => {
+    return first.x === second.x && first.y === second.y;
   };
   const getVector = (direction: Direction) => {
     const map = {
-      0: { x: 0, y: -1 }, // Up
-      1: { x: 1, y: 0 }, // Right
-      2: { x: 0, y: 1 }, // Down
-      3: { x: -1, y: 0 }, // Left
+      up: { x: 0, y: -1 },
+      right: { x: 1, y: 0 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
     };
     return map[direction];
   };
@@ -127,6 +155,8 @@ export function useGridController(): GridContextProps {
       traversals.x.push(index);
       traversals.y.push(index);
     });
+    if (vector.x === 1) traversals.x = traversals.x.reverse();
+    if (vector.y === 1) traversals.y = traversals.y.reverse();
     return traversals;
   };
   const findFarthestPosition = (cell: Position, vector: Position) => {
@@ -148,6 +178,9 @@ export function useGridController(): GridContextProps {
     const tiles: Array<Tile> = [];
     eachCell((x, y, tile) => {
       if (tile) {
+        if (tile.mergedFrom) {
+          tiles.push(...tile.mergedFrom);
+        }
         tiles.push(tile);
       }
     });
@@ -181,6 +214,55 @@ export function useGridController(): GridContextProps {
     console.log(direction);
     if (over) return;
     prepareTiles();
+
+    let cell: Position,
+      merged: Tile,
+      tile: Tile | null,
+      next: Tile | null,
+      positions: { farthest: Position; next: Position };
+    let moved = false;
+    const vector = getVector(direction);
+    const traversals = buildTraversals(vector);
+
+    traversals.x.forEach((x) => {
+      traversals.y.forEach((y) => {
+        cell = { x, y };
+        tile = cellContent(cell);
+
+        if (tile) {
+          positions = findFarthestPosition(cell, vector);
+          next = cellContent(positions.next);
+
+          if (next && next.value === tile.value && !next.mergedFrom) {
+            merged = {
+              position: positions.next,
+              value: tile.value * 2,
+              mergedFrom: [tile, next],
+            };
+
+            insertTile(merged);
+            removeTile(tile);
+            updatePosition(tile, positions.next);
+
+            setScore(score + merged.value);
+          } else {
+            moveTile(tile, positions.farthest);
+          }
+
+          if (!positionEqual(cell, tile.position)) {
+            moved = true;
+          }
+        }
+      });
+    });
+
+    if (moved) {
+      addRandomTile();
+      if (!movesAvailable()) {
+        setOver(true);
+      }
+      saveState();
+    }
   };
 
   return {

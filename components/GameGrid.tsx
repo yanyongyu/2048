@@ -2,6 +2,7 @@ import * as React from "react";
 
 import {
   Direction,
+  Tile,
   useGridControllerContext,
 } from "../hooks/useGridController";
 import {
@@ -12,20 +13,21 @@ import {
 } from "react-native-gesture-handler";
 
 import { Grid } from "./Grid";
+import { View } from "react-native";
 
 export function GameGrid({
   disabled = false,
 }: {
   disabled?: Boolean;
 }): JSX.Element {
-  const { getTiles, saveState, move } = useGridControllerContext();
+  const { getTiles, move } = useGridControllerContext();
 
   const onSwipeGesture = (
     event: HandlerStateChangeEvent<PanGestureHandlerEventPayload>
   ) => {
     if (event.nativeEvent.state !== State.END) return;
     const {
-      nativeEvent: { velocityX: dx, velocityY: dy },
+      nativeEvent: { translationX: dx, translationY: dy },
     } = event;
     const absDx = Math.abs(dx);
     const absDy = Math.abs(dy);
@@ -39,7 +41,6 @@ export function GameGrid({
           ? Direction.down
           : Direction.up
       );
-      saveState();
     }
   };
 
@@ -49,7 +50,9 @@ export function GameGrid({
       shouldCancelWhenOutside={true}
       onHandlerStateChange={onSwipeGesture}
     >
-      <Grid tiles={getTiles()} />
+      <View>
+        <Grid tiles={getTiles()} />
+      </View>
     </PanGestureHandler>
   );
 }

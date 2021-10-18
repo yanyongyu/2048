@@ -2,7 +2,11 @@ import * as React from "react";
 
 import { GridContext, useGridController } from "../hooks/useGridController";
 import { RootStackScreenProps, SIZES } from "../types";
-import { ScoreContext, useScoreController } from "../hooks/useScoreController";
+import {
+  ScoreContext,
+  useScoreController,
+  useScoreControllerContext,
+} from "../hooks/useScoreController";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Container } from "../components/Container";
@@ -24,11 +28,9 @@ function ScoreView({
   );
 }
 
-export default function Game({
-  navigation,
-}: RootStackScreenProps<"Game">): JSX.Element {
-  const scoreController = useScoreController();
+function GameInner({ navigation }: RootStackScreenProps<"Game">): JSX.Element {
   const gridController = useGridController();
+  const scoreController = useScoreControllerContext();
   const { reset, addRandomTile, saveState } = gridController;
 
   // setup and cleanup
@@ -43,32 +45,40 @@ export default function Game({
   );
 
   return (
+    <GridContext.Provider value={gridController}>
+      <Container>
+        <View style={styles.heading}>
+          <View style={styles.headingItem}>
+            <Text style={styles.headingText}>2048</Text>
+          </View>
+          <View style={styles.headingItem}>
+            <View style={styles.scoreBar}>
+              <ScoreView title="Score" score={scoreController.score} />
+              <ScoreView title="Best" score={scoreController.best} />
+            </View>
+          </View>
+        </View>
+        <View style={styles.gameContainer}>
+          <GameGrid />
+        </View>
+        <Text style={styles.tips}>
+          <Text style={styles.tipsBold}>HOW TO PLAY</Text>: Swipe with{" "}
+          <Text style={styles.tipsBold}>your fingers</Text> to move the tiles.
+          Tiles with the same number{" "}
+          <Text style={styles.tipsBold}>merge into one</Text> when they touch.
+          Add them up to reach <Text style={styles.tipsBold}>2048</Text>!
+        </Text>
+      </Container>
+    </GridContext.Provider>
+  );
+}
+
+export default function Game(props: RootStackScreenProps<"Game">): JSX.Element {
+  const scoreController = useScoreController();
+
+  return (
     <ScoreContext.Provider value={scoreController}>
-      <GridContext.Provider value={gridController}>
-        <Container>
-          <View style={styles.heading}>
-            <View style={styles.headingItem}>
-              <Text style={styles.headingText}>2048</Text>
-            </View>
-            <View style={styles.headingItem}>
-              <View style={styles.scoreBar}>
-                <ScoreView title="Score" score={scoreController.score} />
-                <ScoreView title="Best" score={scoreController.best} />
-              </View>
-            </View>
-          </View>
-          <View style={styles.gameContainer}>
-            <GameGrid />
-          </View>
-          <Text style={styles.tips}>
-            <Text style={styles.tipsBold}>HOW TO PLAY</Text>: Swipe with{" "}
-            <Text style={styles.tipsBold}>your fingers</Text> to move the tiles.
-            Tiles with the same number{" "}
-            <Text style={styles.tipsBold}>merge into one</Text> when they touch.
-            Add them up to reach <Text style={styles.tipsBold}>2048</Text>!
-          </Text>
-        </Container>
-      </GridContext.Provider>
+      <GameInner {...props} />
     </ScoreContext.Provider>
   );
 }
