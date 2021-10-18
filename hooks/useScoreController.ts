@@ -30,6 +30,12 @@ export function useScoreController(): ScoreContextProps {
     setScore(0);
     setOver(false);
   };
+
+  React.useEffect(() => {
+    if (score > best) {
+      setBest(score);
+    }
+  }, [score]);
   return { score, setScore, best, setBest, over, setOver, reset };
 }
 

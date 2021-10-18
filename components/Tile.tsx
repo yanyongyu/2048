@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { NUMBERS, SIZES } from "../types";
+import { Position, Tile as TileProps } from "../hooks/useGridController";
 
-import { Tile as TileProps } from "../hooks/useGridController";
 import { useSizeContext } from "../hooks/useSizeContext";
 
 export function Tile({
@@ -23,7 +23,7 @@ export function Tile({
       y: y * widthPresets[size] + (y + 1) * marginPresets[size],
     })
   ).current;
-  const previous = React.useRef({ x, y }).current;
+  // const [previous, setPrevious] = React.useState<Position>({ x, y });
   const newAnimationMove = () => {
     Animated.timing(animateMove, {
       toValue: {
@@ -64,9 +64,7 @@ export function Tile({
     }
   }, []);
   React.useEffect(() => {
-    if (x !== previous.x || y !== previous.y) {
-      newAnimationMove();
-    }
+    newAnimationMove();
   }, [x, y]);
 
   return (
