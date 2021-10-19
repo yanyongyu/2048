@@ -1,5 +1,10 @@
 import * as React from "react";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSize } from "./useSizeContext";
+
+const BESTSCOREKEY = "bestScore";
+
 type ScoreContextProps = {
   score: number;
   setScore: (score: number) => void;
@@ -20,8 +25,9 @@ export const ScoreContext = React.createContext<ScoreContextProps | undefined>(
 );
 
 export function useScoreController(): ScoreContextProps {
+  const { size } = useSize();
   const [score, setScore] = React.useState<number>(0);
-  const [best, setBest] = React.useState<number>(0);
+  const [best, _setBest] = React.useState<number>(0);
   const [over, setOver] = React.useState<boolean>(false);
   const reset = () => {
     if (score > best) {
@@ -31,23 +37,32 @@ export function useScoreController(): ScoreContextProps {
     setOver(false);
   };
 
+  const setBest = React.useCallback(
+    async (best: number) => {
+      await AsyncStorage.setItem(
+        `${BESTSCOREKEY}${size}`,
+        JSON.stringify(best)
+      );
+      _setBest(best);
+    },
+    [size, _setBest]
+  );
+  const readBest = React.useCallback(async () => {
+    const score = await AsyncStorage.getItem(`${BESTSCOREKEY}${size}`);
+    if (score != null) {
+      _setBest(JSON.parse(score));
+    }
+  }, [size, _setBest]);
+
   React.useEffect(() => {
     if (score > best) {
       setBest(score);
     }
-  }, [score]);
+  }, [score, setBest]);
+  React.useEffect(() => {
+    readBest();
+  }, [readBest]);
   return { score, setScore, best, setBest, over, setOver, reset };
-}
-
-export function useScoreChange(): ScoreChangeProps {
-  const [queue, setQueue] = React.useState<Array<number>>([]);
-  return {
-    queue,
-    popScore: () => {
-      queue.shift();
-      setQueue([...queue]);
-    },
-  };
 }
 
 export function useScoreControllerContext(): ScoreContextProps {
