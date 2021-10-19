@@ -20,6 +20,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "top.yyydl.my2048",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
