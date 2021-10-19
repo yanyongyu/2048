@@ -107,8 +107,8 @@ export function useGridController(): GridContextProps {
       direction: Direction,
       tile: Tile | null,
       other: Tile | null;
-    [...Array(size)].forEach((_, x) => {
-      [...Array(size)].forEach((_, y) => {
+    for (let x = 0; x < size; x++) {
+      for (let y = 0; y < size; y++) {
         tile = cellContent({ x, y });
         if (tile) {
           for (let d in Direction) {
@@ -119,8 +119,8 @@ export function useGridController(): GridContextProps {
             if (other && other.value === tile.value) return true;
           }
         }
-      });
-    });
+      }
+    }
     return false;
   };
   const randomAvailableCell = () => {
@@ -214,9 +214,7 @@ export function useGridController(): GridContextProps {
     cells[cell.x][cell.y] = tile;
     updatePosition(tile, cell);
   };
-  // TODO
   const move = (direction: Direction) => {
-    console.log(direction);
     if (over) return;
     prepareTiles();
 

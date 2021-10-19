@@ -49,7 +49,6 @@ export function useScoreController(): ScoreContextProps {
   );
   const readBest = React.useCallback(async () => {
     const score = await AsyncStorage.getItem(`${BESTSCOREKEY}${size}`);
-    console.log(size, score);
     if (score != null) {
       _setBest(JSON.parse(score));
     } else {
