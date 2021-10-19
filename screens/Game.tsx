@@ -30,7 +30,7 @@ function ScoreView({
 
 function GameInner({ navigation }: RootStackScreenProps<"Game">): JSX.Element {
   const gridController = useGridController();
-  const scoreController = useScoreControllerContext();
+  const { score, best } = useScoreControllerContext();
   const { reset, addRandomTile, saveState } = gridController;
 
   // setup and cleanup
@@ -53,8 +53,8 @@ function GameInner({ navigation }: RootStackScreenProps<"Game">): JSX.Element {
           </View>
           <View style={styles.headingItem}>
             <View style={styles.scoreBar}>
-              <ScoreView title="Score" score={scoreController.score} />
-              <ScoreView title="Best" score={scoreController.best} />
+              <ScoreView title="Score" score={score} />
+              <ScoreView title="Best" score={best} />
             </View>
           </View>
         </View>

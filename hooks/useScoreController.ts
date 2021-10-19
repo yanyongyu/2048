@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSize } from "./useSizeContext";
+import { useSizeContext } from "./useSizeContext";
 
 const BESTSCOREKEY = "bestScore";
 
@@ -9,7 +9,7 @@ type ScoreContextProps = {
   score: number;
   setScore: (score: number) => void;
   best: number;
-  setBest: (best: number) => void;
+  setBest: (best: number) => Promise<void>;
   over: boolean;
   setOver: (over: boolean) => void;
   reset: () => void;
@@ -25,7 +25,7 @@ export const ScoreContext = React.createContext<ScoreContextProps | undefined>(
 );
 
 export function useScoreController(): ScoreContextProps {
-  const { size } = useSize();
+  const { size } = useSizeContext();
   const [score, setScore] = React.useState<number>(0);
   const [best, _setBest] = React.useState<number>(0);
   const [over, setOver] = React.useState<boolean>(false);
@@ -49,8 +49,11 @@ export function useScoreController(): ScoreContextProps {
   );
   const readBest = React.useCallback(async () => {
     const score = await AsyncStorage.getItem(`${BESTSCOREKEY}${size}`);
+    console.log(size, score);
     if (score != null) {
       _setBest(JSON.parse(score));
+    } else {
+      _setBest(0);
     }
   }, [size, _setBest]);
 
