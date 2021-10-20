@@ -12,11 +12,11 @@ import {
   State,
   TouchableOpacity,
 } from "react-native-gesture-handler";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Grid } from "./Grid";
-import { View, StyleSheet, Text } from "react-native";
-import { useScoreControllerContext } from "../hooks/useScoreController";
 import { useNavigation } from "@react-navigation/core";
+import { useScoreControllerContext } from "../hooks/useScoreController";
 
 export function GameGrid({
   disabled = false,
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   message: {
-    fontSize: 60,
+    fontSize: 50,
     fontWeight: "bold",
     color: "#776e65",
   },
