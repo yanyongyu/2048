@@ -54,11 +54,10 @@ export function useGridController(): GridContextProps {
 
   // tool functions
   const reset = () => {
-    setCells(
-      Array(size)
-        .fill(0)
-        .map((x) => Array(size).fill(null))
-    );
+    for (let i = 0; i < size; i++) {
+      cells[i] = Array(size).fill(null);
+    }
+    saveState();
     resetScore();
   };
   const eachCell = (
